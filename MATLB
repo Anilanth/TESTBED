@@ -1,0 +1,333 @@
+function varargout = final(varargin)
+% FINAL MATLAB code for final.fig
+%      FINAL, by itself, creates a new FINAL or raises the existing
+%      singleton*.
+%
+%      H = FINAL returns the handle to a new FINAL or the handle to
+%      the existing singleton*.
+%
+%      FINAL('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in FINAL.M with the given input arguments.
+%
+%      FINAL('Property','Value',...) creates a new FINAL or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before final_OpeningFcn gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to final_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help final
+
+% Last Modified by GUIDE v2.5 10-Sep-2022 16:43:24
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @final_OpeningFcn, ...
+                   'gui_OutputFcn',  @final_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before final is made visible.
+function final_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to final (see VARARGIN)
+
+% Choose default command line output for final
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes final wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = final_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+clear all;
+global x;
+
+
+x=serial('COM5','BAUD', 9600); % Make sure the baud rate and COM port is 
+                              % same as in Arduino IDE
+fopen(x);
+
+
+
+% Node data request command
+function turnonled_Callback(hObject, eventdata, handles)
+
+global x;
+global m;
+
+k = strcat((get(handles.edit4,'String')),'BBBBBB6');
+b='waiting';
+set(handles.text8, 'String', b)
+
+fprintf(x,k);
+
+fclose(x);
+
+    if ~isempty(instrfind)
+    fclose(instrfind);
+    delete(instrfind);
+    end
+%****************************************************    
+ m=serial('COM9','BAUD', 9600); % Test bed receiver
+ fopen(m);
+  pause(2);
+  
+  in= fscanf(m);
+%****************************************************  
+  temp = str2double(in);
+  temp = temp+0;
+ % set(handles.text8, 'String', in, 'FontSize', 16);
+  disp(temp);
+  
+  thingSpeakWrite(1846293,temp,'WriteKey','0ZKKTR41PUCANTQC');
+ 
+  set(handles.text8, 'String', in)
+  
+
+% "REFRESH" command
+function turnoffled_Callback(hObject, eventdata, handles)
+
+c = ' Empty        ';
+set(handles.text8, 'String', c)
+
+    if ~isempty(instrfind)
+    fclose(instrfind);
+    delete(instrfind);
+    end
+    clc
+    clear all;
+global x;
+global m;
+
+x=serial('COM5','BAUD', 9600); % Make sure the baud rate and COM port is 
+                              % same as in Arduino IDE
+ fopen(x);
+
+%comment these when using serial ports
+%****************************************************
+
+m=serial('COM9','BAUD', 9600); % Make sure the baud rate and COM port is 
+%                               % same as in Arduino IDE
+fopen(m);
+% ****************************************************
+
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit3 as text
+%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+c = (get(handles.edit3,'String'));
+%c = (get(handles.edit3,'String'));
+
+%set(handles.text3, 'String', c)
+% --- Executes during object creation, after setting all properties.
+function edit3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+
+% --- Executes on button press in idle.
+function idle_Callback(hObject, eventdata, handles)
+% hObject    handle to idle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global x;
+k = strcat((get(handles.edit4,'String')),'BBBBBB6');
+%fprintf(x,'400324322E36');
+fprintf(x,k);
+
+
+function edit4_Callback(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit4 as text
+%        str2double(get(hObject,'String')) returns contents of edit4 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+% --- Executes on button press in pushbutton9.
+function pushbutton9_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global x;
+k = strcat((get(handles.edit4,'String')),'BBBBBB1');
+%fprintf(x,'400324322E36');
+fprintf(x,k);
+
+% --- Executes on button press in pushbutton11.
+function pushbutton11_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton11 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global x;
+k = strcat((get(handles.edit4,'String')),'BBBBBB2');
+%fprintf(x,'400324322E36');
+fprintf(x,k);
+
+% --- Executes on button press in pushbutton12.
+function pushbutton12_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global x;
+
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB3');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+fprintf(x,k);
+
+
+% --- Executes on button press in pushbutton13.
+function pushbutton13_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton13 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global x;
+
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB5');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+fprintf(x,k);
+
+
+
+% --- Executes on button press in pushbutton14.
+function pushbutton14_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton14 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global x;
+
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB7');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+fprintf(x,k);
+
+
+% --- Executes on button press in pushbutton15.
+function pushbutton15_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton15 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global x;
+
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB8');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+fprintf(x,k);
+
+
+% --- Executes on button press in pushbutton16.
+function pushbutton16_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton16 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global x;
+
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB9');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+fprintf(x,k);
+
+
+% --- Executes on button press in togglebutton2.
+function togglebutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton2
+
+global x;
+VAL = get(hObject,'Value');
+
+
+    
+while(VAL == 1)
+b='Sending Display 1';
+set(handles.text8, 'String', b)
+k = strcat((get(handles.edit4,'String')),'BBBBBB9');
+%fprintf(x,'400324322E36');
+set(handles.text8, 'String', k)
+cc = ' sleep mode        ';
+set(handles.text8, 'String', cc)
+pause(3);
+fprintf(x,k);
+pause(3);
+VAL = get(hObject,'Value');
+
+if (VAL == 0)
+    cc = ' Awake        ';
+set(handles.text8, 'String', cc)
+end
+end
